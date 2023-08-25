@@ -1,0 +1,27 @@
+Oriented;3 Corner;L' U2 R U R' U2 L
+Rectangle;2 Corner;R U' R'
+Rectangle;2 Corner;U' R' F R U R U' R' F'
+Snake;2 Corner;R2 D R' U' R D' R2
+Snake;2 Corner;R U' R' U R' U' R U' R' U2 R
+Tank;2 Corner;U' R U' R' U2 R U' R' U2 R U R'
+Tank;2 Corner;R U R' U' R U' R'
+Adjacent;1 Corner;U R U' R' U' R' F R U R U' R' F'
+Adjacent;1 Corner;U R U2 R'
+Adjacent;1 Corner;U' R' F' R U2 R U2 R' F
+Adjacent;1 Corner;R U' R D' R U2 R' D R U2 R
+Bowtie;1 Corner;U' R' F2 R F2 U L' U L
+Bowtie;1 Corner;U R U2 R2 U' R U' R' U2 R
+Bowtie;1 Corner;U R2 D R' U2 R D' R2
+Bowtie;1 Corner;U' L' U R U' R' L
+Gun (Back);1 Corner;R U R2 U' R2 U' R2 U2 R
+Gun (Far);1 Corner;U R' U' R2 U' R2 U2 R
+Gun (Near);1 Corner;U R U' R' U R U2 R'
+Gun (Sides);1 Corner;R U' R' U R U2 R2 U' R2 U' R2 U2 R
+H (Front);0 Corner;U R' U L U' R2 U L' U R'
+H (Side);0 Corner;U R U' R' U R U' R' U R U2 R'
+Pi (Back);0 Corner;R2 D R' U R D' R' U2 R'
+Pi (Far);0 Corner;R U' R2 U2 R U R' U R
+Pi (Front);0 Corner;U R U2 R2 U2 R U R' U R
+Pi (Near);0 Corner;R U' R2 U' R U' R' U2 R
+Sune;0 Corner;R U' R' U' R U R' U R U2 R'
+Sune;0 Corner;R U R' U' R U R' U' R U' R'

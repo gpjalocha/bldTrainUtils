@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <script>
+      async function connect() {
+        try {
+          const options = {
+            filters: [{ namePrefix: "GAN" }],
+            optionalServices: [
+              "f95a48e6-a721-11e9-a2a3-022ae2dbcce4", // Unknown service, primary device
+              "ec4cff6d-81fc-4e5b-91e0-8103885c9ae3", // Unknown characteristic, properties: Read and notify
+              "f95a4b66-a721-11e9-a2a3-022ae2dbcce4", // Unknown characteristic, properties: Read
+              "f95a5034-a721-11e9-a2a3-022ae2dbcce4", // Unknown characteristic, properties: Write
+              "6e400001-b5a3-f393-e0a9-e50e24dc4179", // Unknown service, Primary device
+              "28be4a4a-cd67-11e9-a32f-2a2ae2dbcce4", // Unknown characteristic, Properties: write and write without response
+              "28be4cb6-cd67-11e9-a32f-2a2ae2dbcce4", // Unknown characteristic, Properties: Notify
+              "00001800-0000-1000-8000-00805f9b34fb", // Generic access, primary device (UUID in long format)
+              "00001801-0000-1000-8000-00805f9b34fb", // Generic attribute, primary device (UUID in long format)
+              "00002902-0000-1000-8000-00805f9b34fb", // Client characteristic configuration (UUID in long format)
+            ],
+          };
+          const device = await navigator.bluetooth.requestDevice(options);
+          const server = await device.gatt.connect();
+          console.log("Connected to GAN356i v3 smart cube");
+          const service = await server.getPrimaryService(
+            "6e400001-b5a3-f393-e0a9-e50e24dc4179"
+          );
+          const characteristic = await service.getCharacteristic(
+            "28be4cb6-cd67-11e9-a32f-2a2ae2dbcce4"
+          );
+          characteristic.addEventListener("characteristicvaluechanged", (event) => {
+            // const value = event.target.value;
+            let value = event.target.value;
+             let output = "";
+             for (let i = 0; i < value.byteLength; i++) {
+             output += value.getUint8(i).toString(16).padStart(2, "0") + " ";
+               }
+            console.log(output.trim());
+            // document.getElementById("log").innerHTML += decoder.decode(value) + "<br>";
+          });
+          await characteristic.startNotifications();
+        } catch (error) {
+          console.error("Bluetooth error:", error);
+          // document.getElementById("log").innerHTML += "Bluetooth error: " + error + "<br>";
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <button onclick="connect()">Connect to GAN356i v3 smart cube</button>
+    <div id="log"></div>
+  </body>
+</html>

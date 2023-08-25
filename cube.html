@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Three.js Rubik's Cube with Custom Rotation</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    let scene, camera, renderer, controls;
+    let cube;
+
+    init();
+    animate();
+
+    function init() {
+      // Create a scene
+      scene = new THREE.Scene();
+      
+      // Create a camera
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(5, 5, 5);
+      scene.add(camera);
+      
+      // Create a renderer
+      renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+      
+      // Create controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      
+      // Create a Rubik's Cube
+      const colors = [
+        0xff0000, // red
+        0x00ff00, // green
+        0x0000ff, // blue
+        0xffff00, // yellow
+        0xffa500, // orange
+        0xffffff  // white
+      ];
+      const cubeSize = 2;
+      const cubeGeo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+      const materials = colors.map(color => new THREE.MeshStandardMaterial({color, roughness: 0.7}));
+      const cubeMat = new THREE.MeshFaceMaterial(materials);
+      cube = new THREE.Mesh(cubeGeo, cubeMat);
+      cube.position.set(0, 0, 0);
+      scene.add(cube);
+
+      // Set up lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      directionalLight.position.set(10, 10, 0);
+      scene.add(ambientLight, directionalLight);
+      
+      // Set up window resize handler
+      window.addEventListener('resize', onWindowResize);
+    }
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+      controls.update();
+      
+      // Calculate custom rotation
+      const time = Date.now() * 0.001; // Use time variable for first angle
+      const angle1 = time;
+      const angle2 = Math.sin(time);
+      const angle3 = Math.cos(time);
+      const rotation = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(angle1, angle2, angle3));
+      
+      // Reset cube's rotation matrix to identity matrix
+      cube.matrix.identity();
+      cube.rotation.setFromRotationMatrix(cube.matrix);
+      
+      // Apply custom rotation to Rubik's Cube
+      cube.applyMatrix4(rotation);
+    }
+    
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+  </script>
+</body>
+</html>
