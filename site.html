@@ -23,11 +23,9 @@
   <option value="Pairity">Pairity UFR</option>
   <option value="Corners 3-twists">Corners 3-twists</option>
   <option value="Edges 2-flips">Edges 2-flips</option>
-  <option value="3-twists scramble">Scramble with 3-twists</option>
   <option value="Floating UB">Floating UB</option>
   <option value="Floating UBR">Floating UBR</option>
   <option value="LCCT">LCCT</option>
-  <option value="LTCT">LTCT</option>
 </select>
 <label for="BLDPairity">pairity</label>
 <select name="BLDpairity" id="BLDpairity">
@@ -120,8 +118,6 @@
   <option value="2">2</option>
   <option value="1.8">1.8</option>
   <option value="1.5">1.5</option>
-  <option value="1">1</option>
-  <option value=".7">.7</option>
 </select>
 <button id="buttonCornersM">BLD corners marathon train</button>
 
@@ -144,15 +140,9 @@
   <option value="2">2</option>
   <option value="1.8">1.8</option>
   <option value="1.5">1.5</option>
-    <option value="1">1</option>
-  <option value=".7">.7</option>
 </select>
 <button id="buttonEdgesM">BLD edges marathon train</button>
 
-<div class="container"  >
-    <div style="background-color:grey" id="LTCT_choose" class="left-element">
-</div>
-<br>
 <div class="container">
     <div style="background-color:grey" id="tableTimes" class="left-element">
 </div>
@@ -515,8 +505,6 @@ const tEM = document.getElementById('thEM');
 const TrainMode = document.getElementById('BLDTrainMode');
 const pairity = document.getElementById('BLDpairity').value;
 
-const ltctChoose = document.getElementById('secondSelect');
-
 button.addEventListener('click', updateButton);
 buttonBLD.addEventListener('click', updateButtonBLD);
 buttonPLL.addEventListener('click', updateButtonPLL);
@@ -534,7 +522,6 @@ numEM.addEventListener('change',updateGlobalVarsM);
 numCM.addEventListener('change',updateGlobalVarsM);
 buttonEdgesM.addEventListener('click',updateButtonBLDem);
 buttonCornersM.addEventListener('click',updateButtonBLDcm);
-
 
 function updateGlobalVarsM(typeEl){
   /*update choose list*/
@@ -728,28 +715,6 @@ function generateFloatingPossibilityUB(cuber){
   return [EP,EO]
 }
 
-function generate3TwistCase(cuber){
-  /*init some dummy case*/
-  CP=[0,1,2,3,4,5,6,7]
-  CO=[0,0,0,0,0,0,0,0]
-  /*pick 2 random elements twisted*/
-  twistedEls=CP.slice(1,8).sort(()=>Math.random()-.5).slice(0,2)
-  twistedDir=Math.random()>.5?2:1
-  /*randomize the orientations*/
-  CO=CO.map((x,i)=>twistedEls.includes(i)?twistedDir:(Math.random()<.33333?0:(Math.random()<.5?1:2)))
-  CO[0]=(3+CO[0]-CO.reduce((x,y)=>(x+y)%3))%3
-  /*permute and fix*/
-  CP=CP.sort(()=>Math.random()-.5)
-  twistedEls.map(x=>CP[x]!=x?([CP[x],CP[CP.indexOf(x)]]=[CP[CP.indexOf(x)],CP[x]]):true)
-  /*If there are other twists -> switch with buffer untill there are no other twists*/
-  CP.map((x,i)=>i==0?0:twistedEls.includes(i)?0:(x==i && CO[i]!=0)?1:0).map((x,i)=>x==1?([CP[0],CP[i]]=[CP[i],CP[0]]):true)
-  console.log(CP,CO,twistedEls)
-  /*adjust pairity to edges state*/
-  indToSwitch=CP.indexOf(CP.filter(x=>!twistedEls.concat(CP[0]).includes(x))[0])
-  getNumSwaps(cuber.ep)%2 == getNumSwaps(CP)%2 ? true : [CP[0], CP[indToSwitch]]=[CP[indToSwitch],CP[0]]
-  return [CP,CO]
-}
-
 function generateFloatingPossibilityUBR(cuber){
   /*init some dummy case*/
   CP=[0,1,2,3,5,4,6,7]
@@ -796,7 +761,7 @@ function updateButtonBLD() {
   tmpScramble=[];
   tmpScrambleMoves=[];
   scramblesBLD=[];
-  if (buttonBLD.innerText === 'BLD train' && TrainMode.value!='Pairity' && TrainMode.value!='Corners 3-twists' && TrainMode.value!='Edges 2-flips' && TrainMode.value!='LCCT' && TrainMode.value!='LTCT') {
+  if (buttonBLD.innerText === 'BLD train' && TrainMode.value!='Pairity' && TrainMode.value!='Corners 3-twists' && TrainMode.value!='Edges 2-flips' && TrainMode.value!='LCCT') {
     console.log('generating scrambles...')
     buttonBLD.innerText = 'generating 100 scrambles ...';
     Cube.initSolver()
@@ -829,13 +794,6 @@ function updateButtonBLD() {
           cuber.co=state[1]
           console.log(state[1])
         }
-        else if(TrainMode.value=='3-twists scramble'){
-          cuber.randomize()
-          state=generate3TwistCase(cuber)
-          cuber.cp=state[0]
-          cuber.co=state[1]
-          console.log(state[0], cuber.cp,cuber.co)
-        }
         scramblesBLD=scramblesBLD.concat([invAlg(cuber.solve().split(' ')).join(' ')])
     }
     alg_no=0;
@@ -845,8 +803,6 @@ function updateButtonBLD() {
   } else if(buttonBLD.innerText === 'BLD train' && TrainMode.value=='Pairity'){
     buttonBLD.innerText = 'BLD train in progress...';
   } else if(buttonBLD.innerText === 'BLD train' && TrainMode.value=='Corners 3-twists'){
-    buttonBLD.innerText = 'BLD train in progress...';
-  } else if(buttonBLD.innerText === 'BLD train' && TrainMode.value=='LTCT'){
     buttonBLD.innerText = 'BLD train in progress...';
   } else if(buttonBLD.innerText === 'BLD train' && TrainMode.value=='Edges 2-flips'){
     buttonBLD.innerText = 'BLD train in progress...';
@@ -896,7 +852,7 @@ var tmpScrambleMoves=[]
 var tmpScramble=[]
 function scramblePrinter(event){
   /*show initial scramble*/
-  if(buttonBLD.innerText === "BLD train in progress..." && TrainMode.value!='Pairity'  && TrainMode.value!='Corners 3-twists' && TrainMode.value!='Edges 2-flips' && TrainMode.value!='LTCT' && TrainMode.value!='LCCT'){
+  if(buttonBLD.innerText === "BLD train in progress..." && TrainMode.value!='Pairity'  && TrainMode.value!='Corners 3-twists' && TrainMode.value!='Edges 2-flips' && TrainMode.value!='LCCT'){
     if(status_train == 0){
       tmpScramble=scramblesBLD[alg_no].split(' ')
       document.getElementById('scramble').innerHTML=compareMovesToScr([],tmpScramble)
@@ -1055,7 +1011,6 @@ function updateGlobalVars(typeEl){
 }
 
 function updatePairity(typeEl){
-
 console.log(typeEl.target.value)
   if(typeEl.target.value==='Pairity'){
   pairsTable=pairityStates
@@ -1133,65 +1088,6 @@ console.log(typeEl.target.value)
           updateTableCorners3Twists(times,pairsTable)
         
   })
-
-  }else if(typeEl.target.value === 'LTCT' || ['UU','UD','DU','DD'].includes(typeEl.target.value)){
-    if(document.getElementById("secondSelect") === null){
-        selectRaw="<label for='secondSelect'>Choose LTCT type:</label>"+
-        '<select id="secondSelect">'+
-        '    <option value="UU">UU</option>'+
-        '    <option value="UD">UD</option>'+
-        '    <option value="DU">DU</option>'+
-        '    <option value="DD">DD</option>'+
-        '</select>'
-        document.getElementById('LTCT_choose').innerHTML=selectRaw;
-      }
-  var ltctTypeChange = document.getElementById('secondSelect')
-  ltctTypeChange.addEventListener('change',function(){
-    generateTableLTCT(times,generatePairsLTCT(cuber,'UFR',typeEl.target.value=="LTCT"?"UU":typeEl.target.value))
-  })
-  ltctTypeChange.addEventListener('change',updatePairity);
-  console.log('getting pairs for '+ ['UU','UD','DU','DD'].includes(typeEl.target.value)?typeEl.target.value:"UU");
-  pairsTable=generatePairsLTCT(cuber,'UFR',typeEl.target.value=="LTCT"?"UU":typeEl.target.value)[0].slice();
-  console.log('fetched');
-  console.log(['UU','UD','DU','DD'].includes(typeEl.target.value)?typeEl.target.value:"UU");
-  console.log('pairsTable defined');
-  // console.log(times['corners BLD'].UBR.CT,pairsTable,active_bld_el,active_buf)
-  generateTableLTCT(times,generatePairsLTCT(cuber,'UFR',typeEl.target.value=="LTCT"?"UU":typeEl.target.value));
-  var cells = document.querySelectorAll('td:not(:first-child)');
-  cells.forEach(function(cell) {
-    var cellValue = cell.innerHTML.trim();
-      if(cellValue.match(/^[A-Z]{2}$/)){ 
-                  cell.classList.toggle('selected');
-                  cell.addEventListener('click', function() {
-                      // Toggle the selected class on the clicked cell
-                      console.log('poszklo')
-                      cell.classList.toggle('selected');
-                      if(cell.classList[0] === undefined){pairsTable.splice(pairsTable.indexOf(cellValue),1)}else{pairsTable.push(cellValue)}
-                        // console.log(pairsTable)
-                        updatePairsLTCT(pairsTable)
-                        // console.log(pairs)
-                  });}
-  });
-  var cellUp = document.querySelectorAll('th')[5]
-  cellUp.addEventListener('click',function(){
-    cellUp.classList.toggle('selected')
-        switchCell=cellUp.classList[0]===undefined?0:1
-        cells.forEach(function(upCell){
-          var cellValue = upCell.innerHTML.trim();
-          if(cellValue.match(/^[A-Z]{2}$/)){ 
-            shouldUpdate= switchCell==(upCell.classList[0] === undefined?0:1)?false:true
-            if(shouldUpdate){
-              upCell.classList.toggle('selected')
-          }}
-        })
-          pairsTable=[]
-          if(switchCell == 1){
-            pairsTable=generatePairsLTCT(cuber,'UFR',typeEl.target.value=="LTCT"?"UU":typeEl.target.value)[0]
-          }
-          updateTableLTCT(times,generatePairsLTCT(cuber,'UFR',typeEl.target.value=="LTCT"?"UU":typeEl.target.value))
-        
-  })
-  
 
   }else if(typeEl.target.value === 'Edges 2-flips'){
   pairsTable=generatePairs2Flips(cuber,'UF')[0].slice()
@@ -1347,29 +1243,6 @@ function updatePairs3twists(pairsTable){
     if(pairsTable.length>0){
       allPairsStates=generatePairs3Twists(cuber,'UFR')[1]
       allLPs=generatePairs3Twists(cuber,'UFR')[0]
-      expected_states=[]
-      allPairs=allPairsStates
-        for(i=0;i<pairsTable.length;i++){
-                expected_states=expected_states.concat(allPairsStates[allLPs.indexOf(pairsTable[i])])
-          }
-        }
-}
-
-function updatePairsLTCT(pairsTable,typeLtct=null){
-    buf=active_buf
-    console.log(buf)
-    expected_states=[]
-    alg_no=0;
-    status_train=0;
-    cuber.identity()
-    pairsTable=pairsTable.shuffle()
-    /*force dummy smth*/
-    permuteCycleCorners(cuber,'UFR',"AT");
-    permuteCycleEdges(cuber,'UF',"AT");
-    // console.log(pairsTable)
-    if(pairsTable.length>0){
-      allPairsStates=generatePairsLTCT(cuber,'UFR',typeLtct)[1]
-      allLPs=generatePairsLTCT(cuber,'UFR',typeLtct)[0]
       expected_states=[]
       allPairs=allPairsStates
         for(i=0;i<pairsTable.length;i++){
@@ -1770,17 +1643,7 @@ function BLDStateRegisterHelper(unparsed,_timesAlg=[],depthOneSize=5){
 /* toSolve=['R', 'U', "R'", "D'", 'R', 'U', 'U', "R'", 'D', 'R', 'U', 'U', 'R', "D'", "R'", "U'", 'R', 'D', "R'", "R'"]*/
 /*depth 2 OSTRIZNIE*/
 // toSolve=['R', "U'", "R'", "D'", 'R', 'U', 'U', "R'", 'D', 'R', 'R', "D'", "R'", 'U', "U'", "U'", 'R', 'D', "R'", "R'"]
-/*toSolve="R' R' U' R U R U R U' R' U' U D' F U' F' D U' R U F F R B R' F F R B' U R' R' U' R U R' D' R U' R' U D R R U' D R' 
-U' R D' R' U F' L' U L U' L' U L D L' U' L U L' U' L D' F".split(' ')*/
-
-
-/*UNSOLVED*/
-/*U U' R U R' L' U L' U D' B U' B' D U' L L U' R' R' F B' D D B F' U R U' R' L F R' F' L' R U R U' R' U U R D U' B' U B U D' R' U L R' F F L R' D D L R' L R' U' R' R' D' R U' R' D R U R U U D' D' R U' R' D' R U R' D' U' D' R' D' R U R' D R U' D U U' R U R' L' U L' U D' B U' B' D U' L L U' R' R' F B' D D B F' U R U' R' L F R' F' L' R U R U' R' U U R D U' B' U B U D' R' U L R' F F L R' D D L R' L R' U' R' R' D' R U' R' D R U R U U D' D' R U' R' D' R U R' D' U' D' R' D' R U R' D R U' D*/
-
-
-/*OGARNAC BY TO BYL PAIRITY BO JEST
-U' R' D' R U R' D R//corners UFR canceled moves: R TB, RDF-UFL 35.938/0.539
-R' U' R D' R D R' U R' D' R D R//UNKNOWN 8.099 37.392/0*/
+/*toSolve="R' R' U' R U R U R U' R' U' U D' F U' F' D U' R U F F R B R' F F R B' U R' R' U' R U R' D' R U' R' U D R R U' D R' U' R D' R' U F' L' U L U' L' U L D L' U' L U L' U' L D' F".split(' ')*/
 algMoves=[]
 function BLDStateRegister(event,timesVal=null,cancelsTo=false){
   if(reset == 1){
@@ -2313,37 +2176,6 @@ let i = 0;
                       updateJSONstorage(times)
                     }
                   }
-                  /*LTCT train*/
-               if((buttonBLD.innerText == "BLD train in progress...") & (TrainMode.value=='LTCT') & (status_train==0)){
-                  count=mvcnt
-                  st=Date.now();
-                  st_reaction=Date.now();
-                  copy_cube(acjs_cube['kostka'],solved_cube);
-                  expected_state=expected_states[alg_no]
-                  status_train=1;
-                  document.getElementById("tmpsaver").innerHTML = "<p style=\"font-size:30px; \">" +memo_map[pairsTable[alg_no]]+" "+letter_stickers_rev.corners.UFR[sticker_map_rev.corners[0][sticker_map.corners[ letter_stickers.corners.UFR[pairsTable[alg_no][1]]][0]]]+ "</p>"
-                  // document.getElementById("tmpsaver").innerHTML = "<p style=\"font-size:14px; \">" +pairsTable[alg_no]+ "</p>"
-                }
-                if((buttonBLD.innerText == 'BLD train in progress...') & (TrainMode.value=='LTCT') & (status_train==1)){
-                    en=Date.now();
-                    if(mvcnt==count){st_reaction=Date.now();}
-                    if(convertAcjs(acjs_cube['kostka']) == expected_state){
-                      times["LTCT"][pairsTable[alg_no]].reaction.push(Math.round((st_reaction-st),2)/1000);
-                      times["LTCT"][pairsTable[alg_no]].exec_time.push(Math.round((en-st_reaction),2)/1000);
-                      times["LTCT"][pairsTable[alg_no]].total_time.push(Math.round((en-st),2)/1000);
-                      times["LTCT"][pairsTable[alg_no]].TPS.push((mvcnt-count)/(Math.round((en-st_reaction),2)/1000));
-                      alg_no=alg_no+1;
-                      console.log('next alg')
-                      if((alg_no+1)>(expected_states.length)){
-                         alg_no=0;
-                         updateButtonBLD();
-                         updateTableLTCT(times,generatePairsLTCT(cuber,'UFR',document.getElementById('secondSelect').value));
-                         }
-                      status_train=0;
-                      document.getElementById("log").innerHTML = String(Math.round((en-st),2)/1000)+ "<br>";
-                      updateJSONstorage(times);
-                    }
-                  }
                 /*edges 2 flips train*/
                if((buttonBLD.innerText == "BLD train in progress...") & (TrainMode.value=='Edges 2-flips') & (status_train==0)){
                   count=mvcnt
@@ -2392,7 +2224,7 @@ let i = 0;
                       //times["edges 2-flips"][pairsTable[alg_no]].total_time.push(Math.round((en-st),2)/1000)
                       //times["edges 2-flips"][pairsTable[alg_no]].TPS.push((mvcnt-count)/(Math.round((en-st_reaction),2)/1000))
                       alg_no=alg_no+1;
-                      console.log('next alg');
+                      console.log('next alg')
                       if((alg_no+1)>(expected_states.length)){
                          alg_no=0;
                          updateButtonBLD();
