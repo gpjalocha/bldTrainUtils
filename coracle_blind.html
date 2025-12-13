@@ -21,10 +21,10 @@
 		<meta http-equiv="Content-Type" content="text/html; iso-8859-1"/>
 		<link rel="shortcut icon" href="./coracle/favicon.ico"/>
 		<!-- Google AdSense -->
-		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3780153732295177" crossorigin="anonymous"></script>
 		<script type="text/javascript">
 		//<![CDATA[
 			var BASE = "coracle/"
+			mapper='0120 0510 0450 0240 1321 1531 3543 2342'
 			var CMAP = [ // Maps faces to corner cubies
 				[8,0,3,8,2,1],
 				[1,8,0,4,8,5],
@@ -61,8 +61,10 @@
 				"dbl.gif",
 				"dlf.gif"]
 			var FACES = 'urfdlb';
+			//123 162 156 135 243 264 465 345
+			//012 051 045 024 132 153 354 234
 			var COLS = 'yrbwog';
-			var FINSCORE = 10;
+			var FINSCORE = 30;
 			var perm = [0,1,2,3,4,5]; // face permutation
 			var perm2 = [0,1,2,3,4,5,6,7]; // cubie permutation
 			var pb = read_cookie('coracle_pb');
@@ -119,7 +121,7 @@
 				toggle_corner(-1);
 				// Preload case images
 				images = new Array();
-				for(var i = 0; i < 96; i++){
+				for(var i = 0; i < (24*5); i++){
 					images[i] = new Image();
 					images[i].src = case_img(i);
 				}
@@ -143,6 +145,7 @@
 				if(popup_visible) return;
 				var crn = CMAP[n1][n2];
 				var c = perm2[c];
+				// ALL KEYS ALLOWED MODE!!
 				if(c == crn){
 					score++;
 					document.getElementById('score').innerHTML = score;
@@ -161,12 +164,13 @@
 			}
 			function new_case(){
 				var rn;
-				var npos = 0; for(var i = 0; i < 4; i++) if(show & (1 << i)) npos++;
+				var npos = 0; for(var i = 0; i < 5; i++) if(show & (1 << i)) npos++;
 				do{
 					rn = Math.floor(Math.random() * (24 * npos - 1));
 					if(!(show & 1)) rn += 24;
 					if(!(show & 2) && rn >= 24) rn += 24;
 					if(!(show & 4) && rn >= 48) rn += 24;
+					if(!(show & 8) && rn >= 72) rn += 24;
 					if(rn >= prn) rn++;
 				// Prevent selection of u-cases if set
 				}while(nou && (Math.floor((rn % 24) / 4) == 0 || rn % 4 == 0))
@@ -181,17 +185,26 @@
 				n2 = n % 4;
 				n2 = (n2 > 1 ? n2 + 1 : n2);
 				if((n1 % 3) == (n2 % 3)) n2 += (2 - (n1 % 3));
+				ind_n3=mapper.indexOf(n1+''+n2)+2
+				if((ind_n3 % 5) ==4){ind_n3-=3}
+				n3 = mapper[ind_n3]*1
+				// if((n3 % 3) == (n1 % 3)) n3 += (2 - (n1 % 3));
+				// if((n3 % 3) == (n2 % 3)) n3 += (2 - (n2 % 3));
+				//0120 0510 0450 0240 1321 1531 3543 2342
+				console.log(n1,n2,n3)
 				var c1 = FACES.charAt(n1);
 				var c2 = FACES.charAt(n2);
+				var c3 = FACES.charAt(n3);
 				var args;
 				switch(pos){
 					case 0 : args = '&r=y65x-15&fd=nnnndn'+c1+'nnnnnnrnnnn'+c2+'nnnbnnnn'; break;
 				   case 1 : args = '&r=y65x15&fd=nnnnnnnnnnnnnrnnnnnnnnbn'+c1+'nn'+c2+'nnnunnnn'; break;
 					case 2 : args = '&r=y25x-15&fd=nn'+c2+'ndnnnnnn'+c1+'nfnnnnnnnnrnnnnn'; break;
 					case 3 : args = '&r=x-90y25x20&fd=nnnnrnnnnnnnnfn'+c2+'nnnnnnunnn'+c1; break;
+					case 4 : args = '&r=y115x-15&fd=nn'+c2+'ndnnnnnn'+c1+'nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn'+c3+'nnnfnnnn'; break;
 				}
 				console.log(args)
-				return 'http://cube.rider.biz/visualcube.php?fmt=svg&size=200' + args;
+				return 'https://visualcube.api.cubing.net/visualcube.php?fmt=svg&size=200' + args;
 			}
 			function toggle_nou(){
 				nou = (nou + 1) % 2;
@@ -215,6 +228,7 @@
 				document.getElementById('r_check').src = BASE + (show & 2 ? "check_on.gif" : "check_off.gif");
 				document.getElementById('d_check').src = BASE + (show & 4 ? "check_on.gif" : "check_off.gif");
 				document.getElementById('u_check').src = BASE + (show & 8 ? "check_on.gif" : "check_off.gif");
+				document.getElementById('f_check').src = BASE + (show & 16 ? "check_on.gif" : "check_off.gif");
 				// New game if rules changed
 				if(c >= 0 && !popup_visible) start_game();
 			}
@@ -268,8 +282,12 @@
 					document.getElementById('popup_box').innerHTML = msg +
 						"<br/><br/><a href='#' onclick='popup();return false'>OK</a>";
 					document.getElementById('popup_box').className = "visible";
+					document.addEventListener('keydown', function(e) {
+					switch(e.keyCode) { case 32: document.querySelector("#popup_box > a").click(); break; }
+				});
 				}else{
 					popup_visible = false;
+
 					document.getElementById('popup_box').className = "invisible";
 					start_game();
 				}
@@ -400,9 +418,10 @@
 				R: <img id="r_check" src="coracle/check_off.gif" onclick="toggle_corner(1)" alt="l_check"/> &nbsp;&nbsp;&nbsp;
 				D: <img id="d_check" src="coracle/check_off.gif" onclick="toggle_corner(2)" alt="d_check"/> &nbsp;&nbsp;&nbsp;
 				U: <img id="u_check" src="coracle/check_off.gif" onclick="toggle_corner(3)" alt="u_check"/> &nbsp;&nbsp;&nbsp;
+				F: <img id="f_check" src="coracle/check_off.gif" onclick="toggle_corner(4)" alt="f_check"/> &nbsp;&nbsp;&nbsp;
 				NOU: <img id="nou_check" src="coracle/check_off.gif" onclick="toggle_nou()" alt="nou"/> &nbsp;&nbsp;&nbsp;
 				<br/>
-				<img id="cube" src="http://cube.rider.biz/visualcube.php?fmt=svg&amp;size=200&amp;r=y45x-35&amp;fd=n" alt="Cube"/>
+				<img id="cube" src="https://visualcube.api.cubing.net/visualcube.php?fmt=svg&amp;size=200&amp;r=y45x-35&amp;fd=n" alt="Cube"/>
 				<br/><br/>
 			</div>
 			<table id="clicker">
